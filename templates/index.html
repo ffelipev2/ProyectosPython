@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" class="colorFondo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Subir PDF</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <link rel="stylesheet" href="static/css/estilos.css">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+<body class="colorFondo">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+             <h1 class="text-center">Contrato de trabajo</h1>
+            <h4 class="text-center">Subir Documento PDF</h4>
+            <div style="align-items: center; text-align:center;">
+                <img src="/static/img/1.png" width="100" height="100" >
+            </div>
+
+            {% if message %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    swal({
+                        title: "{{ 'Éxito' if success else 'Error' }}",
+                        text: "{{ message }}",
+                        icon: "{{ 'success' if success else 'error' }}",
+                        button: "OK",
+                    });
+                });
+            </script>
+            {% endif %}
+            <form action="/" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Selecciona un archivo PDF</label>
+                    <input type="file" class="form-control-file" id="file" name="file[]" accept="application/pdf" multiple required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-custom" >Subir</button>
+            </form>
+            <br>
+            <table id="example" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="encabezados">Rut suministrador</th>
+                        <th class="encabezados">Razon social suministrador</th>
+                        <th class="encabezados">Rut cliente</th>
+                        <th class="encabezados">Razon social cliente</th>
+                        <th class="encabezados">Nombre instalación</th>
+                        <th class="encabezados">Fecha inicio</th>
+                        <th class="encabezados">Fecha termino</th>
+                        <th class="encabezados">Energia contratada</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(0, var|length, 8) %} <!-- Modificar el numero por la cantidad de columnas -->
+                    <tr>
+                        <td>{{ var[i] }}</td>
+                        <td>{{ var[i + 1] }}</td>
+                        <td>{{ var[i + 2] }}</td>
+                        <td>{{ var[i + 3] }}</td>
+                        <td>{{ var[i + 4] }}</td>
+                        <td>{{ var[i + 5] }}</td>
+                        <td>{{ var[i + 6] }}</td>
+                        <td>{{ var[i + 7] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- SweetAlert JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+<!-- DataTables Buttons JS -->
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.colVis.min.js"></script>
+<!-- Inicialización de DataTables con botones de exportación -->
+<script>
+    $(document).ready(function() {
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
+</body>
+</html>
