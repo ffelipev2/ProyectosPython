@@ -1,0 +1,45 @@
+<!-- templates/ver_datos.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Datos PDF</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center">Datos PDF</h1>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Rut Suministrador</th>
+                <th>Razón Social Suministrador</th>
+                <th>Rut Cliente</th>
+                <th>Razón Social Cliente</th>
+                <th>Nombre Instalación</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Término</th>
+                <th>Energia Contratada</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dato in datos %}
+            <tr>
+                <td>{{ dato.id }}</td>
+                <td>{{ dato.rut_suministrador }}</td>
+                <td>{{ dato.razon_social_suministrador }}</td>
+                <td>{{ dato.rut_cliente }}</td>
+                <td>{{ dato.razon_social_cliente }}</td>
+                <td>{{ dato.nombre_instalacion }}</td>
+                <td>{{ dato.fecha_inicio }}</td>
+                <td>{{ dato.fecha_termino }}</td>
+                <td>{{ dato.energia_contratada }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,4 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 import os
 import fitz  # PyMuPDF
 import nltk
@@ -9,6 +13,34 @@ app = Flask(__name__)
 # Configuración de la carpeta de subida
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Configuración de la base de datos
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializar la base de datos
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Modelo de datos
+class PDFData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rut_suministrador = db.Column(db.String(100))
+    razon_social_suministrador = db.Column(db.String(100))
+    rut_cliente = db.Column(db.String(100))
+    razon_social_cliente = db.Column(db.String(100))
+    nombre_instalacion = db.Column(db.String(100))
+    fecha_inicio = db.Column(db.String(100))
+    fecha_termino = db.Column(db.String(100))
+    energia_contratada = db.Column(db.String(100))
+    energia_contratada2 = db.Column(db.String(100))
+
+    def __repr__(self):
+        return f'<PDFData {self.id}>'
+
+# Configuración de Flask-Admin
+admin = Admin(app, name='Base de datos PDF', template_mode='bootstrap3')
+admin.add_view(ModelView(PDFData, db.session))
 
 # Asegúrate de que la carpeta de subidas exista
 if not os.path.exists(UPLOAD_FOLDER):
@@ -33,14 +65,30 @@ def index():
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
                     nombre = 'uploads/' + file.filename
                     tokens = leerDocumentoYtokenizar(nombre)
-                    lista.append(imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, [',', 'entre', ], [',', 'RUT', 'N°'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=2))
-                    lista.append(imprimir_texto_entre_tokens(tokens, ['E'], ['En'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'], ['.', 'El', 'CLIENTE'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'], [',', 'a', 'suministrar'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, ['y', 'hasta', 'el'], ['.', 'El'], ocurrencia=1))
-                    lista.append(imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"], ocurrencia=1))
+                    data = [
+                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, [',', 'entre', ], [',', 'RUT', 'N°'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=2),
+                        imprimir_texto_entre_tokens(tokens, ['E'], ['En'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'], ['.', 'El', 'CLIENTE'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'], [',', 'a', 'suministrar'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ['y', 'hasta', 'el'], ['.', 'El'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"], ocurrencia=1),
+                    ]
+                    lista.extend(data)
+                    # Guardar los datos en la base de datos
+                    pdf_data = PDFData(
+                        rut_suministrador=data[0],
+                        razon_social_suministrador=data[1],
+                        rut_cliente=data[2],
+                        razon_social_cliente=data[3],
+                        nombre_instalacion=data[4],
+                        fecha_inicio=data[5],
+                        fecha_termino=data[6],
+                        energia_contratada=data[7]
+                    )
+                    db.session.add(pdf_data)
+                    db.session.commit()
                     message = f"Los archivos se subieron correctamente"
                     success = True
                 else:
@@ -88,6 +136,7 @@ def imprimir_texto_entre_tokens(lista_tokens, tokens_inicio, tokens_fin, ocurren
 
     return resultado
 
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Crear las tablas de la base de datos
     app.run(debug=True)
