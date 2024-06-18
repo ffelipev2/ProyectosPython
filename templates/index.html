@@ -13,6 +13,30 @@
     <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 <body class="colorFondo">
+<!--
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Menu</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="index">Contrato 1<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="contrato2">Contrato 2</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Contrato 3</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+-->
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -53,19 +77,24 @@
                         <th class="encabezados">Fecha inicio</th>
                         <th class="encabezados">Fecha termino</th>
                         <th class="encabezados">Energia contratada</th>
+                        <th class="encabezados">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(0, var|length, 8) %} <!-- Modificar el numero por la cantidad de columnas -->
+                    {% for pdf_data in pdf_data_list %}
                     <tr>
-                        <td>{{ var[i] }}</td>
-                        <td>{{ var[i + 1] }}</td>
-                        <td>{{ var[i + 2] }}</td>
-                        <td>{{ var[i + 3] }}</td>
-                        <td>{{ var[i + 4] }}</td>
-                        <td>{{ var[i + 5] }}</td>
-                        <td>{{ var[i + 6] }}</td>
-                        <td>{{ var[i + 7] }}</td>
+                        <td>{{ pdf_data.rut_suministrador }}</td>
+                        <td>{{ pdf_data.razon_social_suministrador }}</td>
+                        <td>{{ pdf_data.rut_cliente }}</td>
+                        <td>{{ pdf_data.razon_social_cliente }}</td>
+                        <td>{{ pdf_data.nombre_instalacion }}</td>
+                        <td>{{ pdf_data.fecha_inicio }}</td>
+                        <td>{{ pdf_data.fecha_termino }}</td>
+                        <td>{{ pdf_data.energia_contratada }}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm edit-btn" data-id="{{ pdf_data.id }}">✏️</button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="{{ pdf_data.id }}">🗑️</button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -101,6 +130,26 @@
             buttons: [
                 'copy', 'csv', 'excel', 'pdf', 'print'
             ]
+        });
+
+        // Edit button click handler
+        $('.edit-btn').on('click', function() {
+            var id = $(this).data('id');
+            window.location.href = '/edit/' + id;
+        });
+
+        // Delete button click handler
+        $('.delete-btn').on('click', function() {
+            var id = $(this).data('id');
+            if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+                $.ajax({
+                    url: '/delete/' + id,
+                    type: 'POST',
+                    success: function(response) {
+                        location.reload();
+                    }
+                });
+            }
         });
     });
 </script>

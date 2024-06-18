@@ -3,26 +3,22 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from controllers import *
 import os
-import fitz  # PyMuPDF
-import nltk
-from nltk.tokenize import word_tokenize
+
 
 app = Flask(__name__)
 
-# Configuración de la carpeta de subida
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'gatito1234578'
 
-# Inicializar la base de datos
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Modelo de datos
+
 class PDFData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rut_suministrador = db.Column(db.String(100))
@@ -33,30 +29,29 @@ class PDFData(db.Model):
     fecha_inicio = db.Column(db.String(100))
     fecha_termino = db.Column(db.String(100))
     energia_contratada = db.Column(db.String(100))
-    energia_contratada2 = db.Column(db.String(100))
 
     def __repr__(self):
         return f'<PDFData {self.id}>'
 
-# Configuración de Flask-Admin
+
 admin = Admin(app, name='Base de datos PDF', template_mode='bootstrap3')
 admin.add_view(ModelView(PDFData, db.session))
 
-# Asegúrate de que la carpeta de subidas exista
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     message = None
     success = False
-    lista = []  # Inicializa la lista fuera del bloque condicional
+    lista = []
     if request.method == 'POST':
         if 'file[]' not in request.files:
             message = 'No se encontró ningún archivo'
             success = False
         else:
-            files = request.files.getlist('file[]')  # Obtener una lista de archivos
+            files = request.files.getlist('file[]')
             for file in files:
                 if file.filename == '':
                     message = 'No se seleccionó ningún archivo'
@@ -66,14 +61,20 @@ def index():
                     nombre = 'uploads/' + file.filename
                     tokens = leerDocumentoYtokenizar(nombre)
                     data = [
-                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'],
+                                                    ocurrencia=1),
                         imprimir_texto_entre_tokens(tokens, [',', 'entre', ], [',', 'RUT', 'N°'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=2),
+                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'],
+                                                    ocurrencia=2),
                         imprimir_texto_entre_tokens(tokens, ['E'], ['En'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'], ['.', 'El', 'CLIENTE'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'], [',', 'a', 'suministrar'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens,
+                                                    ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'],
+                                                    ['.', 'El', 'CLIENTE'], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'],
+                                                    [',', 'a', 'suministrar'], ocurrencia=1),
                         imprimir_texto_entre_tokens(tokens, ['y', 'hasta', 'el'], ['.', 'El'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"], ocurrencia=1),
+                        imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"],
+                                                    ocurrencia=1),
                     ]
                     lista.extend(data)
                     # Guardar los datos en la base de datos
@@ -94,49 +95,38 @@ def index():
                 else:
                     message = 'Formato de archivo no permitido. Solo se permiten archivos PDF.'
                     success = False
-        return render_template('index.html', message=message, success=success, var=lista)
-    return render_template('index.html')
+
+    pdf_data_list = PDFData.query.all()
+    return render_template('index.html', message=message, success=success, pdf_data_list=pdf_data_list, var=lista)
 
 
-def leerDocumentoYtokenizar(nombre):
-    pdf_path = str(nombre)
-    pdf_document = fitz.open(pdf_path)
-    pdf_text = ""
-    for page_num in range(pdf_document.page_count):
-        page = pdf_document.load_page(page_num)
-        pdf_text += page.get_text()
-    pdf_document.close()
-    tokens = word_tokenize(pdf_text)
-    return tokens
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    pdf_data = PDFData.query.get(id)
+    if pdf_data:
+        db.session.delete(pdf_data)
+        db.session.commit()
+    return redirect(url_for('index'))
 
-def imprimir_texto_entre_tokens(lista_tokens, tokens_inicio, tokens_fin, ocurrencia=1):
-    # Variable para almacenar el resultado
-    resultado = ""
-    ocurrencias_encontradas = 0
 
-    # Buscar todas las ocurrencias de la secuencia de tokens de inicio
-    for i in range(len(lista_tokens) - len(tokens_inicio) + 1):
-        if lista_tokens[i:i + len(tokens_inicio)] == tokens_inicio:
-            ocurrencias_encontradas += 1
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    pdf_data = PDFData.query.get(id)
+    if request.method == 'POST':
+        pdf_data.rut_suministrador = request.form['rut_suministrador']
+        pdf_data.razon_social_suministrador = request.form['razon_social_suministrador']
+        pdf_data.rut_cliente = request.form['rut_cliente']
+        pdf_data.razon_social_cliente = request.form['razon_social_cliente']
+        pdf_data.nombre_instalacion = request.form['nombre_instalacion']
+        pdf_data.fecha_inicio = request.form['fecha_inicio']
+        pdf_data.fecha_termino = request.form['fecha_termino']
+        pdf_data.energia_contratada = request.form['energia_contratada']
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('edit.html', pdf_data=pdf_data)
 
-            # Verificar si esta es la ocurrencia que se quiere imprimir
-            if ocurrencias_encontradas == ocurrencia:
-                indice_inicio = i
-
-                # Buscar el índice de la secuencia de tokens de fin
-                for j in range(i + len(tokens_inicio), len(lista_tokens) - len(tokens_fin) + 1):
-                    if lista_tokens[j:j + len(tokens_fin)] == tokens_fin:
-                        indice_fin = j
-
-                        # Obtener el texto entre las secuencias de tokens de inicio y fin
-                        texto_entre_tokens = lista_tokens[indice_inicio + len(tokens_inicio):indice_fin]
-                        resultado = ' '.join(texto_entre_tokens)
-                        break
-                break  # Romper el bucle externo si se encuentra la ocurrencia deseada
-
-    return resultado
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Crear las tablas de la base de datos
+        db.create_all()
     app.run(debug=True)

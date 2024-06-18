@@ -1,0 +1,9 @@
+CAMBIOS EN LA BASE DE DATOS - MIGRACIÓN
+*****************************************
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+
+CREAR ARCHIVO REQUIREMENT
+*****************************************
+pip freeze > requirements.txt

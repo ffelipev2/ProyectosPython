@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" class="colorFondo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Editar PDF Data</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="colorFondo">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center">Editar Registro</h2>
+            <form action="/edit/{{ pdf_data.id }}" method="post">
+                <div class="form-group">
+                    <label for="rut_suministrador">Rut Suministrador</label>
+                    <input type="text" class="form-control" id="rut_suministrador" name="rut_suministrador" value="{{ pdf_data.rut_suministrador }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="razon_social_suministrador">Razón Social Suministrador</label>
+                    <input type="text" class="form-control" id="razon_social_suministrador" name="razon_social_suministrador" value="{{ pdf_data.razon_social_suministrador }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="rut_cliente">Rut Cliente</label>
+                    <input type="text" class="form-control" id="rut_cliente" name="rut_cliente" value="{{ pdf_data.rut_cliente }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="razon_social_cliente">Razón Social Cliente</label>
+                    <input type="text" class="form-control" id="razon_social_cliente" name="razon_social_cliente" value="{{ pdf_data.razon_social_cliente }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="nombre_instalacion">Nombre Instalación</label>
+                    <input type="text" class="form-control" id="nombre_instalacion" name="nombre_instalacion" value="{{ pdf_data.nombre_instalacion }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha Inicio</label>
+                    <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ pdf_data.fecha_inicio }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_termino">Fecha Término</label>
+                    <input type="text" class="form-control" id="fecha_termino" name="fecha_termino" value="{{ pdf_data.fecha_termino }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="energia_contratada">Energía Contratada</label>
+                    <input type="text" class="form-control" id="energia_contratada" name="energia_contratada" value="{{ pdf_data.energia_contratada }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
