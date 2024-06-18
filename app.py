@@ -62,16 +62,7 @@ def index():
                     tokens = leerDocumentoYtokenizar(nombre)
                     data = contrato_1(tokens)
                     lista.extend(data)
-                    pdf_data = PDFData(
-                        rut_suministrador=data[0],
-                        razon_social_suministrador=data[1],
-                        rut_cliente=data[2],
-                        razon_social_cliente=data[3],
-                        nombre_instalacion=data[4],
-                        fecha_inicio=data[5],
-                        fecha_termino=data[6],
-                        energia_contratada=data[7]
-                    )
+                    pdf_data = guardar_contrato_1(data)
                     db.session.add(pdf_data)
                     db.session.commit()
                     message = "Los archivos se subieron correctamente"
@@ -109,10 +100,6 @@ def edit(id):
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('edit.html', pdf_data=pdf_data)
-
-
-
-
 
 if __name__ == '__main__':
     with app.app_context():
