@@ -7,40 +7,15 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
     <link rel="stylesheet" href="static/css/estilos.css">
-    <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 <body class="colorFondo">
-<!--
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Menu</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="index">Contrato 1<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="contrato2">Contrato 2</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Contrato 3</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
-      </li>
-    </ul>
-  </div>
-</nav>
--->
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-12">
-             <h1 class="text-center">Contrato de trabajo</h1>
+            <h1 class="text-center">Contrato de trabajo</h1>
             <h4 class="text-center">Subir Documento PDF</h4>
             <div style="align-items: center; text-align:center;">
                 <img src="/static/img/1.png" width="100" height="100" >
@@ -82,7 +57,7 @@
                 </thead>
                 <tbody>
                     {% for pdf_data in pdf_data_list %}
-                    <tr>
+                    <tr id="row-{{ pdf_data.id }}">
                         <td>{{ pdf_data.rut_suministrador }}</td>
                         <td>{{ pdf_data.razon_social_suministrador }}</td>
                         <td>{{ pdf_data.rut_cliente }}</td>
@@ -113,7 +88,6 @@
 <!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
-<!-- DataTables Buttons JS -->
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -146,7 +120,15 @@
                     url: '/delete/' + id,
                     type: 'POST',
                     success: function(response) {
-                        location.reload();
+                        if (response.success) {
+                            $('#row-' + id).remove();
+                            swal("Éxito", "El registro ha sido eliminado correctamente", "success");
+                        } else {
+                            swal("Error", response.error || "No se pudo eliminar el registro", "error");
+                        }
+                    },
+                    error: function() {
+                        swal("Error", "Ocurrió un error al intentar eliminar el registro", "error");
                     }
                 });
             }

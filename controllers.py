@@ -1,6 +1,23 @@
 import nltk
 from nltk.tokenize import word_tokenize
 import fitz  # PyMuPDF
+def contrato_1(tokens):
+    data = [
+        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, [',', 'entre'], [',', 'RUT', 'N°'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'], ocurrencia=2),
+        imprimir_texto_entre_tokens(tokens, ['E'], ['En'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'],
+                                    ['.', 'El', 'CLIENTE'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'],
+                                    [',', 'a', 'suministrar'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, ['y', 'hasta', 'el'], ['.', 'El'], ocurrencia=1),
+        imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"], ocurrencia=1),
+    ]
+    return data
+
+
+
 def leerDocumentoYtokenizar(nombre):
     pdf_path = str(nombre)
     pdf_document = fitz.open(pdf_path)

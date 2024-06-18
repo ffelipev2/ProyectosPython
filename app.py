@@ -4,8 +4,8 @@ from flask_migrate import Migrate
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from controllers import *
-import os
 
+import os
 
 app = Flask(__name__)
 
@@ -60,24 +60,8 @@ def index():
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
                     nombre = 'uploads/' + file.filename
                     tokens = leerDocumentoYtokenizar(nombre)
-                    data = [
-                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'],
-                                                    ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, [',', 'entre', ], [',', 'RUT', 'N°'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, [',', 'RUT', 'N°'], [',', 'representada', 'por'],
-                                                    ocurrencia=2),
-                        imprimir_texto_entre_tokens(tokens, ['E'], ['En'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens,
-                                                    ['funcionamiento', 'de', 'sus', 'instalaciones', 'ubicadas', 'en'],
-                                                    ['.', 'El', 'CLIENTE'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ['se', 'obliga', ',', 'a', 'contar', 'del', 'día'],
-                                                    [',', 'a', 'suministrar'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ['y', 'hasta', 'el'], ['.', 'El'], ocurrencia=1),
-                        imprimir_texto_entre_tokens(tokens, ["[", "GWh/año", "]"], ["CUARTO", ":", "PRECIO"],
-                                                    ocurrencia=1),
-                    ]
+                    data = contrato_1(tokens)
                     lista.extend(data)
-                    # Guardar los datos en la base de datos
                     pdf_data = PDFData(
                         rut_suministrador=data[0],
                         razon_social_suministrador=data[1],
@@ -90,7 +74,7 @@ def index():
                     )
                     db.session.add(pdf_data)
                     db.session.commit()
-                    message = f"Los archivos se subieron correctamente"
+                    message = "Los archivos se subieron correctamente"
                     success = True
                 else:
                     message = 'Formato de archivo no permitido. Solo se permiten archivos PDF.'
@@ -106,7 +90,8 @@ def delete(id):
     if pdf_data:
         db.session.delete(pdf_data)
         db.session.commit()
-    return redirect(url_for('index'))
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'Registro no encontrado'})
 
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -124,6 +109,9 @@ def edit(id):
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('edit.html', pdf_data=pdf_data)
+
+
+
 
 
 if __name__ == '__main__':
