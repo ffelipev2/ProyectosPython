@@ -4,77 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Laboratorio 4.0</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        // Función para validar el RUT en tiempo real
-        function validarRutEnTiempoReal(input) {
-            const rut = input.value.trim(); // Obtener el valor del campo RUT
-            const mensajeError = document.getElementById('rut-error'); // Elemento para mostrar el mensaje de error
-
-            if (rut === "") {
-                mensajeError.textContent = ""; // Limpiar el mensaje si el campo está vacío
-                return;
-            }
-
-            // Validar el formato del RUT
-            if (!/^\d{7,8}-[\dkK]$/.test(rut)) {
-                mensajeError.textContent = "Formato de RUT inválido. Use el formato 12345678-9 o 12345678-K.";
-                return;
-            }
-
-            // Validar el dígito verificador
-            const [numero, dv] = rut.split("-");
-            const dvCalculado = calcularDigitoVerificador(numero);
-
-            if (dv.toUpperCase() !== dvCalculado) {
-                mensajeError.textContent = "RUT inválido. El dígito verificador no es correcto.";
-                return;
-            }
-
-            // Si el RUT es válido, limpiar el mensaje de error
-            mensajeError.textContent = "";
-        }
-
-        // Función para calcular el dígito verificador
-        function calcularDigitoVerificador(numero) {
-            let suma = 0;
-            let multiplicador = 2;
-
-            for (let i = numero.length - 1; i >= 0; i--) {
-                suma += parseInt(numero[i]) * multiplicador;
-                multiplicador++;
-                if (multiplicador > 7) multiplicador = 2;
-            }
-
-            const dv = 11 - (suma % 11);
-            if (dv === 11) return '0';
-            if (dv === 10) return 'K';
-            return dv.toString();
-        }
-
-        // Función para ocultar los mensajes después de 3 segundos
-        function ocultarMensajes() {
-            const mensajes = document.querySelectorAll('.alert');
-            mensajes.forEach(function(mensaje) {
-                setTimeout(function() {
-                    mensaje.style.display = 'none';
-                }, 3000); // 3000 milisegundos = 3 segundos
-            });
-        }
-
-        // Ejecutar la función cuando la página se cargue
-        window.onload = ocultarMensajes;
-
-        // Función para mostrar un formulario y ocultar los demás
-        function mostrarFormulario(id) {
-            // Oculta todos los formularios
-            document.querySelectorAll('.formulario').forEach(form => {
-                form.classList.add('hidden');
-            });
-            // Muestra el formulario seleccionado
-            document.getElementById(id).classList.remove('hidden');
-        }
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </head>
 <body>
     <nav>
@@ -99,13 +30,16 @@
         <!-- Formulario de Registro de Estudiante -->
         <div id="registroForm" class="formulario hidden">
             <h2>Registrar Estudiante</h2>
+            <!-- Logo debajo del texto "Registrar Estudiante" -->
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
             <form action="{{ url_for('registrar') }}" method="POST">
                 <input type="text" name="rut" placeholder="RUT (ej: 12345678-9)" required
-                       oninput="validarRutEnTiempoReal(this)">
-                <div id="rut-error" class="error-message" style="color: red;"></div>
+                       oninput="validarRutEnTiempoReal(this, 'rut-error')">
+                <div id="rut-error" class="error-message"></div>
                 <input type="text" name="nombre" placeholder="Nombre" required>
                 <input type="text" name="apellido" placeholder="Apellido" required>
                 <select name="carrera" required>
+                    <option value="" disabled selected>Escoge tu carrera</option>
                     <option value="Ingeniería Civil en Informática">Ingeniería Civil en Informática</option>
                     <option value="Ingeniería Civil en Obras Civiles">Ingeniería Civil en Obras Civiles</option>
                     <option value="Ingeniería Civil Industrial">Ingeniería Civil Industrial</option>
@@ -114,6 +48,7 @@
                     <option value="No pertenece a ninguna de estas carreras">No pertenece a ninguna de estas carreras</option>
                 </select>
                 <select name="asignatura" required>
+                    <option value="" disabled selected>Escoge tu asignatura</option>
                     <option value="TALLER EN EMPRESA I">TALLER EN EMPRESA I</option>
                     <option value="HORMIGÓN ARMADO">HORMIGÓN ARMADO</option>
                     <option value="TALLER INTERFA. Y DIS. SOFTW">TALLER INTERFA. Y DIS. SOFTW</option>
@@ -126,16 +61,21 @@
         <!-- Formulario de Registro de Visita -->
         <div id="visitaForm" class="formulario">
             <h2>Registrar Visita</h2>
-            <form action="{{ url_for('visita') }}" method="POST">
+            <!-- Logo debajo del texto "Registrar Visita" -->
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <form action="{{ url_for('visita') }}" method="POST" onsubmit="return validarFormularioVisita()">
                 <input type="text" name="buscar_rut" placeholder="Ingrese su RUT (ej: 12345678-9)" required
-                       oninput="validarRutEnTiempoReal(this)">
-                <div id="rut-error-visita" class="error-message" style="color: red;"></div>
+                       oninput="validarRutEnTiempoReal(this, 'rut-error-visita')">
+                <div id="rut-error-visita" class="error-message"></div>
                 <select name="motivo" required>
+                    <option value="" disabled selected>Escoge el motivo de tu visita</option>
                     <option value="Consultas">Consultas</option>
                     <option value="Usar el espacio o equipamiento">Usar el espacio o equipamiento</option>
                     <option value="Otros">Otros</option>
                 </select>
-                <input type="number" name="minutos" placeholder="Minutos de permanencia" required>
+                <input type="number" name="minutos" placeholder="Minutos de permanencia" required
+                       oninput="validarMinutosEnTiempoReal(this, 'minutos-error')">
+                <div id="minutos-error" class="error-message"></div>
                 <button type="submit">Registrar Visita</button>
             </form>
         </div>

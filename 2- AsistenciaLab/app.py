@@ -52,7 +52,7 @@ if not os.path.exists(archivo_estudiantes):
     df.to_excel(archivo_estudiantes, index=False)
 
 if not os.path.exists(archivo_visitas):
-    df = pd.DataFrame(columns=['RUT', 'Nombre', 'Apellido', 'Fecha', 'Hora', 'Motivo', 'Minutos'])
+    df = pd.DataFrame(columns=['RUT', 'Nombre', 'Apellido', 'Carrera', 'Asignatura', 'Motivo', 'Fecha', 'Hora', 'Minutos'])
     df.to_excel(archivo_visitas, index=False)
 
 @app.route('/')
@@ -109,8 +109,9 @@ def visita():
             fecha = datetime.now().strftime('%Y-%m-%d')
             hora = datetime.now().strftime('%H:%M:%S')
 
-            nueva_visita = pd.DataFrame([[rut, estudiante['Nombre'], estudiante['Apellido'], fecha, hora, motivo, minutos]],
-                                        columns=['RUT', 'Nombre', 'Apellido', 'Fecha', 'Hora', 'Motivo', 'Minutos'])
+            # Crear el nuevo registro con el orden especificado
+            nueva_visita = pd.DataFrame([[rut, estudiante['Nombre'], estudiante['Apellido'], estudiante['Carrera'], estudiante['Asignatura'], motivo, fecha, hora, minutos]],
+                                        columns=['RUT', 'Nombre', 'Apellido', 'Carrera', 'Asignatura', 'Motivo', 'Fecha', 'Hora', 'Minutos'])
             df_visitas = pd.concat([df_visitas, nueva_visita], ignore_index=True)
             df_visitas.to_excel(archivo_visitas, index=False)
             flash('Visita registrada con éxito.', 'success')
