@@ -6,6 +6,15 @@ from datetime import datetime, timedelta
 import schedule
 import time
 import threading
+import matplotlib
+matplotlib.use('Agg')
+import plotly.figure_factory as ff
+import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.io as pio
+
+import io
+import base64
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta'
@@ -202,6 +211,104 @@ def visita():
             flash(f'Error al registrar la visita: {str(e)}', 'error')
 
     return redirect(url_for('formulario'))
+
+@app.route('/dashboard')
+def dashboard():
+    import plotly.express as px
+    import plotly.io as pio
+    import plotly.figure_factory as ff
+
+    df_estudiantes = pd.read_excel(archivo_estudiantes, dtype={'RUT': str})
+    df_visitas = pd.read_excel(archivo_visitas, dtype={'RUT': str})
+
+    graphs = {}
+
+    # 1. Alumnos por Carrera
+    carrera_counts = df_estudiantes['Carrera'].value_counts().reset_index()
+    carrera_counts.columns = ['Carrera', 'Cantidad']
+    fig1 = px.bar(
+        carrera_counts,
+        x='Cantidad',
+        y='Carrera',
+        orientation='h',
+        title='Alumnos Registrados por Carrera',
+        color='Carrera',
+        height=500
+    )
+    fig1.update_layout(
+        margin=dict(l=150, r=40, t=60, b=60),
+        yaxis_tickfont=dict(size=14)
+    )
+    graphs['carreras'] = pio.to_html(fig1, full_html=False)
+
+    # 2. Motivos de Visita
+    motivo_counts = df_visitas['Motivo'].value_counts().reset_index()
+    motivo_counts.columns = ['Motivo', 'Cantidad']
+    fig2 = px.pie(
+        motivo_counts,
+        names='Motivo',
+        values='Cantidad',
+        title='Distribución de Motivos de Visita',
+        height=500
+    )
+    fig2.update_layout(margin=dict(l=40, r=40, t=60, b=60))
+    graphs['motivos'] = pio.to_html(fig2, full_html=False)
+
+    # 3. Visitas por Mes
+    df_visitas['Fecha'] = pd.to_datetime(df_visitas['Fecha'], errors='coerce')
+    df_visitas['Mes'] = df_visitas['Fecha'].dt.strftime('%B')
+    visitas_mes = df_visitas['Mes'].value_counts().sort_index().reset_index()
+    visitas_mes.columns = ['Mes', 'Cantidad']
+    fig3 = px.line(
+        visitas_mes,
+        x='Mes',
+        y='Cantidad',
+        markers=True,
+        title='Visitas al Laboratorio por Mes',
+        height=500
+    )
+    fig3.update_layout(
+        margin=dict(l=60, r=40, t=60, b=80),
+        xaxis_tickangle=-45,
+        xaxis_tickfont=dict(size=14)
+    )
+    graphs['meses'] = pio.to_html(fig3, full_html=False)
+
+    # 4. Mapa de Calor: Alumnos por Carrera y Asignatura
+    pivot = df_estudiantes.groupby(['Carrera', 'Asignatura']).size().reset_index(name='Cantidad')
+    heatmap_data = pivot.pivot(index='Carrera', columns='Asignatura', values='Cantidad').fillna(0)
+
+    z = heatmap_data.values
+    x = list(heatmap_data.columns)
+    y = list(heatmap_data.index)
+
+    fig4 = ff.create_annotated_heatmap(
+        z,
+        x=x,
+        y=y,
+        colorscale='Blues',
+        showscale=True,
+        annotation_text=[[str(int(val)) for val in row] for row in z],
+        hoverinfo='z'
+    )
+
+    fig4.update_layout(
+        title=dict(
+            text='Mapa de Calor: Alumnos por Carrera y Asignatura',
+            x=0.5,  # centrado horizontalmente
+            y=0.1,  # posición al fondo del área del gráfico
+            xanchor='center',
+            yanchor='bottom'  # ancla el texto por su parte inferior
+        ),
+        height=700,
+        margin=dict(l=200, r=40, t=60, b=150)
+    )
+
+    graphs['asignaturas'] = pio.to_html(fig4, full_html=False)
+
+    return render_template('dashboard.html', graphs=graphs)
+
+
 
 if __name__ == '__main__':
     app.run(debug=False)

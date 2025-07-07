@@ -25,6 +25,20 @@ nav button:hover {
     background-color: #004080;
 }
 
+nav a button, nav button {
+    background-color: #0056b3;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+nav a button:hover, nav button:hover {
+    background-color: #004080;
+}
+
 .container {
     max-width: 500px;
     background: white;
@@ -88,4 +102,16 @@ button[type="submit"]:hover {
 .alert-error {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+.error-message {
+    color: red;
+}
+
+/* Estilos para el logo */
+.logo {
+    width: 120px;
+    height: auto;
+    display: block;
+    margin: 10px auto;
 }

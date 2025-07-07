@@ -8,11 +8,11 @@
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </head>
 <body>
-    <nav>
-        <button onclick="mostrarFormulario('registroForm')">Registrar Estudiante</button>
-        <button onclick="mostrarFormulario('visitaForm')">Registrar Visita</button>
-    </nav>
-
+<nav>
+    <button onclick="mostrarFormulario('registroForm')">Registrar Estudiante</button>
+    <button onclick="mostrarFormulario('visitaForm')">Registrar Visita</button>
+    <a href="{{ url_for('dashboard') }}"><button>Ver Dashboard</button></a>
+</nav>
     <div class="container">
         <h2>Registro de Laboratorio 4.0</h2>
 

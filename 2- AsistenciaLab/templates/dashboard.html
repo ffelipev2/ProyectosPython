@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Laboratorio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 20px auto;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .grid-item {
+            background-color: #fafafa;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        nav a button, nav button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        nav a button:hover, nav button:hover {
+            background-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <button onclick="window.location.href='{{ url_for('formulario') }}#registroForm'">Registrar Estudiante</button>
+        <button onclick="window.location.href='{{ url_for('formulario') }}#visitaForm'">Registrar Visita</button>
+        <a href="{{ url_for('dashboard') }}"><button>Ver Dashboard</button></a>
+    </nav>
+
+    <div class="dashboard-container">
+        <h1>Dashboard del Laboratorio</h1>
+        <div class="grid-container">
+            <div class="grid-item">{{ graphs['carreras']|safe }}</div>
+            <div class="grid-item">{{ graphs['motivos']|safe }}</div>
+            <div class="grid-item">{{ graphs['meses']|safe }}</div>
+            <div class="grid-item">{{ graphs['asignaturas']|safe }}</div>
+        </div>
+    </div>
+</body>
+</html>
