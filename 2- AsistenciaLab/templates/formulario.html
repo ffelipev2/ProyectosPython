@@ -11,7 +11,13 @@
 <nav>
     <button onclick="mostrarFormulario('registroForm')">Registrar Estudiante</button>
     <button onclick="mostrarFormulario('visitaForm')">Registrar Visita</button>
-    <a href="{{ url_for('dashboard') }}"><button>Ver Dashboard</button></a>
+    <button onclick="window.location='{{ url_for('dashboard') }}'">
+        Ver Dashboard
+    </button>
+    <a href="https://1drv.ms/f/c/6623511ef4231298/EkFifAtU6etOtWZ5kWQNtiUB58E3h_ENsm-khzYg6pBfFg?e=qo5FGU"
+       target="_blank" rel="noopener">
+        <button>Ver Registros</button>
+    </a>
 </nav>
     <div class="container">
         <h2>Registro de Laboratorio 4.0</h2>

@@ -3,6 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Laboratorio</title>
+    <!-- Tu JS original -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <!-- Override de mostrarFormulario: si no existe el formulario aquí, redirige -->
+    <script>
+      (function() {
+        const origMostrar = window.mostrarFormulario;
+        window.mostrarFormulario = function(id) {
+          if (document.getElementById(id)) {
+            // Si el div existe, ejecuta la función normal
+            origMostrar(id);
+          } else {
+            // Si no existe, redirige a la página de formulario
+            window.location.href = "{{ url_for('formulario') }}";
+          }
+        };
+      })();
+    </script>
+    <!-- Tu CSS original -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         .dashboard-container {
@@ -51,20 +69,26 @@
     </style>
 </head>
 <body>
-    <nav>
-        <button onclick="window.location.href='{{ url_for('formulario') }}#registroForm'">Registrar Estudiante</button>
-        <button onclick="window.location.href='{{ url_for('formulario') }}#visitaForm'">Registrar Visita</button>
-        <a href="{{ url_for('dashboard') }}"><button>Ver Dashboard</button></a>
-    </nav>
+<nav>
+    <button onclick="mostrarFormulario('registroForm')">Registrar Estudiante</button>
+    <button onclick="mostrarFormulario('visitaForm')">Registrar Visita</button>
+    <button onclick="window.location='{{ url_for('dashboard') }}'">
+        Ver Dashboard
+    </button>
+    <a href="https://1drv.ms/f/c/6623511ef4231298/EkFifAtU6etOtWZ5kWQNtiUB58E3h_ENsm-khzYg6pBfFg?e=qo5FGU"
+       target="_blank" rel="noopener">
+        <button>Ver Registros</button>
+    </a>
+</nav>
 
-    <div class="dashboard-container">
-        <h1>Dashboard del Laboratorio</h1>
-        <div class="grid-container">
-            <div class="grid-item">{{ graphs['carreras']|safe }}</div>
-            <div class="grid-item">{{ graphs['motivos']|safe }}</div>
-            <div class="grid-item">{{ graphs['meses']|safe }}</div>
-            <div class="grid-item">{{ graphs['asignaturas']|safe }}</div>
-        </div>
+<div class="dashboard-container">
+    <h1>Dashboard del Laboratorio</h1>
+    <div class="grid-container">
+        <div class="grid-item">{{ graphs['carreras']|safe }}</div>
+        <div class="grid-item">{{ graphs['motivos']|safe }}</div>
+        <div class="grid-item">{{ graphs['meses']|safe }}</div>
+        <div class="grid-item">{{ graphs['asignaturas']|safe }}</div>
     </div>
+</div>
 </body>
 </html>
