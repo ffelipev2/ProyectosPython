@@ -31,7 +31,7 @@
         <div id="registroForm" class="formulario hidden">
             <h2>Registrar Estudiante</h2>
             <!-- Logo debajo del texto "Registrar Estudiante" -->
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
             <form action="{{ url_for('registrar') }}" method="POST">
                 <input type="text" name="rut" placeholder="RUT (ej: 12345678-9)" required
                        oninput="validarRutEnTiempoReal(this, 'rut-error')">
@@ -62,7 +62,7 @@
         <div id="visitaForm" class="formulario">
             <h2>Registrar Visita</h2>
             <!-- Logo debajo del texto "Registrar Visita" -->
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
             <form action="{{ url_for('visita') }}" method="POST" onsubmit="return validarFormularioVisita()">
                 <input type="text" name="buscar_rut" placeholder="Ingrese su RUT (ej: 12345678-9)" required
                        oninput="validarRutEnTiempoReal(this, 'rut-error-visita')">

@@ -96,7 +96,7 @@ button[type="submit"]:hover {
 
 /* Estilos para el logo */
 .logo {
-    width: 150px; /* Ajusta el tamaño según sea necesario */
+    width: 120px; /* Ajusta el tamaño según sea necesario */
     height: auto; /* Mantiene la proporción de la imagen */
     display: block; /* Coloca el logo en una línea independiente */
     margin: 10px auto; /* Centra el logo y agrega espacio arriba y abajo */

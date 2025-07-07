@@ -1,13 +1,96 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pandas as pd
 import os
-from datetime import datetime
+import shutil
+from datetime import datetime, timedelta
+import schedule
+import time
+import threading
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta'
 
 archivo_estudiantes = 'registros_laboratorio.xlsx'
 archivo_visitas = 'visitas_laboratorio.xlsx'
+
+# Ruta de respaldo en OneDrive
+BACKUP_PATH = r'C:\Users\ffeli\OneDrive\RespaldoAsistencia'
+LOCK_FILE = "backup.lock"  # Evita ejecuciones simultáneas
+
+def is_another_instance_running():
+    return os.path.exists(LOCK_FILE)
+
+def create_lock():
+    with open(LOCK_FILE, "w") as f:
+        f.write("running")
+
+def remove_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+def backup_files():
+    """Copia los archivos a la carpeta de OneDrive y limpia los antiguos"""
+    if is_another_instance_running():
+        print("Ya hay una instancia corriendo. Se omite este respaldo.")
+        return
+
+    create_lock()
+    try:
+        if not os.path.exists(archivo_estudiantes) or not os.path.exists(archivo_visitas):
+            print("Error: Los archivos originales no existen")
+            return
+
+        os.makedirs(BACKUP_PATH, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        estudiantes_backup = f"registros_laboratorio_{timestamp}.xlsx"
+        visitas_backup = f"visitas_laboratorio_{timestamp}.xlsx"
+
+        shutil.copy2(archivo_estudiantes, os.path.join(BACKUP_PATH, estudiantes_backup))
+        shutil.copy2(archivo_visitas, os.path.join(BACKUP_PATH, visitas_backup))
+
+        print(f"Respaldo completado: {estudiantes_backup} y {visitas_backup}")
+    except Exception as e:
+        print(f"Error en respaldo: {str(e)}")
+    finally:
+        remove_lock()
+        limpiar_respaldos_antiguos()
+
+def limpiar_respaldos_antiguos():
+    """Mantiene solo los respaldos del día actual y del anterior."""
+    try:
+        archivos = os.listdir(BACKUP_PATH)
+        archivos = [f for f in archivos if f.startswith(('registros_laboratorio_', 'visitas_laboratorio_'))]
+
+        def get_fecha(nombre):
+            try:
+                return nombre.split("_")[2]
+            except IndexError:
+                return None
+
+        hoy = datetime.now().strftime("%Y%m%d")
+        ayer = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+        fechas_validas = {hoy, ayer}
+
+        for archivo in archivos:
+            fecha = get_fecha(archivo)
+            if fecha and fecha not in fechas_validas:
+                os.remove(os.path.join(BACKUP_PATH, archivo))
+                print(f"Archivo eliminado: {archivo}")
+    except Exception as e:
+        print(f"Error al limpiar respaldos antiguos: {str(e)}")
+
+def schedule_backup():
+    """Programa el respaldo diario a las 17:30"""
+    schedule.every().day.at("17:30").do(backup_files)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # Revisa cada minuto
+
+# Iniciar el programador en un hilo separado
+backup_thread = threading.Thread(target=schedule_backup)
+backup_thread.daemon = True
+backup_thread.start()
 
 
 def validar_rut(rut):
@@ -121,4 +204,4 @@ def visita():
     return redirect(url_for('formulario'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
