@@ -308,6 +308,30 @@ def draw_multiline_text(
     )
 
 
+def draw_centered_multiline_text(
+    canvas,
+    text,
+    center_x,
+    y,
+    max_width=1000,
+    line_height=40,
+    size=36,
+    color=REC_TEXT,
+    bold=False,
+):
+    lines = canvas.wrap_text(text, max_width=max_width, size=size, bold=bold)
+    for index, line in enumerate(lines):
+        canvas.text(
+            line,
+            center_x,
+            y + index * line_height,
+            size=size,
+            color=color,
+            bold=bold,
+            anchor="ma",
+        )
+
+
 def draw_star_rating(canvas, center_x, center_y, filled_stars, total_stars=3):
     spacing = 78
     start_x = center_x - ((total_stars - 1) * spacing) / 2
@@ -919,7 +943,7 @@ try:
         else:
             total_questions = len(QUESTIONS)
             final_msg = f"Tu puntaje: {score} / {total_questions}"
-            star_rating = max(1, min(3, score))
+            star_rating = max(0, min(3, score))
 
             if score == total_questions:
                 msg2 = "Modo festivalero nivel experto."
@@ -950,14 +974,14 @@ try:
                 anchor="mm",
             )
             draw_star_rating(text_canvas, 640, 350, star_rating)
-            draw_multiline_text(
+            draw_centered_multiline_text(
                 text_canvas,
                 msg2,
-                x=340,
-                y=405,
-                max_width=610,
-                line_height=38,
-                size=29,
+                center_x=640,
+                y=392,
+                max_width=700,
+                line_height=34,
+                size=27,
                 color=msg2_color,
                 bold=True,
             )
