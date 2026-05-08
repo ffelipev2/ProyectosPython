@@ -1,0 +1,2 @@
+"""Visual hand effects package."""
+

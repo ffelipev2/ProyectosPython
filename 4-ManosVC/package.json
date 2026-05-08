@@ -1,0 +1,16 @@
+{
+  "name": "manosvc",
+  "version": "1.0.0",
+  "main": "app.py",
+  "scripts": {
+    "start": "python app.py",
+    "desktop": "python app.py --desktop"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Efectos visuales de manos para Universidad San Sebastian.",
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.35"
+  }
+}

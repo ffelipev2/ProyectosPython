@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Universidad San Sebasti&aacute;n</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <video id="camera" playsinline muted></video>
+      <canvas id="scene"></canvas>
+
+      <header class="topbar">
+        <img class="brand" src="../assets/images/uss_logo.png" alt="Logo USS" />
+        <h1>Universidad San Sebasti&aacute;n</h1>
+      </header>
+
+      <nav class="effect-panel effect-panel-left" aria-label="Efecto manos">
+        <button class="effect-button is-active" type="button" data-effect="hands" aria-label="Efecto manos">
+          <span class="hand-icon" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <nav class="effect-panel effect-panel-right" aria-label="Efecto energ&iacute;a">
+        <button class="effect-button" type="button" data-effect="energy" aria-label="Efecto energ&iacute;a">
+          <span class="energy-icon" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <nav class="effect-panel effect-panel-bottom" aria-label="Efecto cara">
+        <button class="effect-button" type="button" data-effect="face" aria-label="Efecto cara">
+          <span class="face-icon" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <section class="start-panel" id="startPanel">
+        <button class="start-button" id="startButton" type="button">Iniciar c&aacute;mara</button>
+        <p id="statusText">Abre esta p&aacute;gina desde localhost y permite el uso de la c&aacute;mara.</p>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
